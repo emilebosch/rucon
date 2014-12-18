@@ -15,9 +15,14 @@ module Rucon
 
     desc "fetchfs [url] [name]", "Fetch a squash fs'ed fs sytem"
     def fetchfs(url, name)
-      `mkdir -p fs/store/`
-      cmd = "curl #{url} > fs/store/#{name}.sqsh"
-      `#{cmd}`
+      ensure_root!
+
+      command "mkdir -p fs/store/"
+      command "curl #{url} > fs/store/#{name}.sqsh"
+
+      p = "./fs/mnt/#{name}"
+      command "mkdir -p #{p}"   
+      command "mount -t squashfs fs/store/#{name}.sqsh #{p}"
     end
 
     desc "mountfs [name]", "Mounts an fs"

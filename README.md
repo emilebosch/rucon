@@ -1,6 +1,6 @@
 # Rucon
 
-Simple ruby containers
+Simple ruby containers. Aimed as a POC and maybe someday a bit more than that. 
 
 - ruby
 - curl
@@ -28,11 +28,9 @@ Objectives:
 
 ```
 bundle
-bundle binstub ricon
+bundle binstub rucon
 
-./bin/rucon fetchfs file:///home/vagrant/base.sqsh my-base
-sudo ./bin/rucon mountfs my-base
-
+sduo ./bin/rucon fetchfs file:///home/vagrant/base.sqsh my-base
 sudo ./bin/rucon create my-container my-base
 sudo ./bin/rucon enter my-container
 
