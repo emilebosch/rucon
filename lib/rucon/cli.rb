@@ -13,8 +13,8 @@ module Rucon
     #   ['tree']
     # end
 
-    desc "fetch [URL]", "Fetch a squash fs'ed fs sytem"
-    def fetch(url, name)
+    desc "fetchfs [url] [name]", "Fetch a squash fs'ed fs sytem"
+    def fetchfs(url, name)
       `mkdir -p fs/store/`
       cmd = "curl #{url} > fs/store/#{name}.sqsh"
       `#{cmd}`
@@ -22,6 +22,7 @@ module Rucon
 
     desc "mountfs [name]", "Mounts an fs"
     def mountfs(name)
+      ensure_root!
       sq = "fs/store/#{name}.sqsh"
       die "#{sq} doesnt exis, did u download it" unless File.exists? sq
 
@@ -33,6 +34,7 @@ module Rucon
 
     desc "create [name] [basefs]", "Creates a container from base fs"
     def create(name, base)
+      ensure_root!
       p = "./fs/mnt/#{base}"
 
       die "rootfs #{base} not mounted" unless Dir.exists? p
@@ -49,6 +51,8 @@ module Rucon
 
     desc "enter [name]", "enters a container"
     def enter(name)
+      ensure_root!
+
       cmb = "./containers/#{name}"
       die "No container at path #{cmb}, dit u create it?" unless Dir.exists? cmb
       cmd = "systemd-nspawn -D #{cmb}"
@@ -57,6 +61,8 @@ module Rucon
 
     desc "boot [name]", "enters boots"
     def boot(name)
+      ensure_root!
+      
       cmb = "./containers/#{name}"
       die "No container at path #{cmb}, dit u create it?" unless Dir.exists? cmb
       cmd = "systemd-nspawn -bD #{cmb}"
@@ -64,6 +70,10 @@ module Rucon
     end
 
     private
+
+    def ensure_root!
+      die 'Must run as root' unless Process.uid == 0
+    end
 
     def die(msg)
       puts msg
