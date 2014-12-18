@@ -5,39 +5,32 @@ module Rucon
 
     desc "version", "Shows version information"
     def version
-      puts SetEnv::VERSION
+      puts Rucon::VERSION
     end
 
-    # desc "deps", "install dependenciess"
-    # def deps
-    #   ['tree']
-    # end
-
-    desc "fetchfs [url] [name]", "Fetch a squash fs'ed fs sytem"
-    def fetchfs(url, name)
+    desc "fetchfs [URL]", "Fetch a squash fs'ed fs sytem"
+    def fetchfs(url)
       ensure_root!
 
+      # download
+      name = File.basename(url, ".sqsh")
       command "mkdir -p fs/store/"
       command "curl #{url} > fs/store/#{name}.sqsh"
 
+      # mount
+      mountfs name
+    end
+
+    desc "mountfs [name]", "Mounts a base filesystem"
+    def mountfs(name)
+      ensure_root!
+      
       p = "./fs/mnt/#{name}"
       command "mkdir -p #{p}"   
       command "mount -t squashfs fs/store/#{name}.sqsh #{p}"
     end
 
-    desc "mountfs [name]", "Mounts an fs"
-    def mountfs(name)
-      ensure_root!
-      sq = "fs/store/#{name}.sqsh"
-      die "#{sq} doesnt exis, did u download it" unless File.exists? sq
-
-      p = "./fs/mnt/#{name}"
-
-      command "mkdir -p #{p}"
-      command "mount -t squashfs fs/store/#{name}.sqsh #{p}"
-    end
-
-    desc "create [name] [basefs]", "Creates a container from base fs"
+    desc "create [NAME] [BASEFS]", "Creates a container from base fs"
     def create(name, base)
       ensure_root!
       p = "./fs/mnt/#{base}"
@@ -48,30 +41,30 @@ module Rucon
       cmb   = "./containers/#{name}"
       rw    = "./containers/#{name}-rw"
       
-      cmd = "mkdir -p #{cmb} #{rw}"
+      cmd   = "mkdir -p #{cmb} #{rw}"
 
-      command "mkdir -p #{cmb} #{rw}"
-      command "mount -t overlayfs overlayfs -olowerdir=#{p},upperdir=#{rw} #{cmb}"
+      # command "mkdir -p #{cmb} #{rw}"
+      # command "mount -t overlayfs overlayfs -olowerdir=#{p},upperdir=#{rw} #{cmb}"
     end
 
-    desc "enter [name]", "enters a container"
+    desc "enter [NAME]", "Enters a container without booting"
     def enter(name)
       ensure_root!
 
       cmb = "./containers/#{name}"
-      die "No container at path #{cmb}, dit u create it?" unless Dir.exists? cmb
-      cmd = "systemd-nspawn -D #{cmb}"
-      system(cmd)
+      die "No container at path #{cmb}, did u create it?" unless Dir.exists? cmb
+
+      system "systemd-nspawn -D #{cmb}"
     end
 
-    desc "boot [name]", "enters boots"
+    desc "boot [NAME]", "Boots a container"
     def boot(name)
       ensure_root!
       
       cmb = "./containers/#{name}"
-      die "No container at path #{cmb}, dit u create it?" unless Dir.exists? cmb
-      cmd = "systemd-nspawn -bD #{cmb}"
-      system(cmd)
+      die "No container at path #{cmb}, did u create it?" unless Dir.exists? cmb
+
+      system "systemd-nspawn -bD #{cmb}"
     end
 
     private
