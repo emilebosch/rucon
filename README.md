@@ -30,7 +30,7 @@ Objectives:
 bundle
 bundle binstub rucon
 
-sduo ./bin/rucon fetchfs file:///home/vagrant/base.sqsh my-base
+sudo ./bin/rucon fetchfs file:///home/vagrant/base.sqsh my-base
 sudo ./bin/rucon create my-container my-base
 sudo ./bin/rucon enter my-container
 
