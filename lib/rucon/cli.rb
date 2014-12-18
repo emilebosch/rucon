@@ -16,9 +16,6 @@ module Rucon
       name = File.basename(url, ".sqsh")
       command "mkdir -p fs/store/"
       command "curl #{url} > fs/store/#{name}.sqsh"
-
-      # mount
-      mountfs name
     end
 
     desc "mountfs [name]", "Mounts a base filesystem"
@@ -33,41 +30,54 @@ module Rucon
     desc "create [NAME] [BASEFS]", "Creates a container from base fs"
     def create(name, base)
       ensure_root!
-      p = "./fs/mnt/#{base}"
 
-      die "rootfs #{base} not mounted" unless Dir.exists? p
-      puts "Creating container #{name}"
+      basefs_mount = "./fs/mnt/#{base}"
+      die "rootfs #{base} not mounted" unless Dir.exists? basefs_mount
 
-      cmb   = "./containers/#{name}"
-      rw    = "./containers/#{name}-rw"
-      
-      cmd   = "mkdir -p #{cmb} #{rw}"
-
-      # command "mkdir -p #{cmb} #{rw}"
-      # command "mount -t overlayfs overlayfs -olowerdir=#{p},upperdir=#{rw} #{cmb}"
+      cr = "./containers/#{name}"
+      system "mkdir -p #{cr}/rw #{cr}/combined"
+      File.write "#{cr}/FS",  base
     end
 
     desc "enter [NAME]", "Enters a container without booting"
     def enter(name)
       ensure_root!
 
-      cmb = "./containers/#{name}"
-      die "No container at path #{cmb}, did u create it?" unless Dir.exists? cmb
+      cr = "./containers/#{name}"
+      die "No container at path #{cmb}, did u create it?" unless Dir.exists? cr
 
-      system "systemd-nspawn -D #{cmb}"
+      mount_container name
+      system "systemd-nspawn -D #{cr}/combined"
     end
 
     desc "boot [NAME]", "Boots a container"
     def boot(name)
       ensure_root!
       
-      cmb = "./containers/#{name}"
-      die "No container at path #{cmb}, did u create it?" unless Dir.exists? cmb
-
-      system "systemd-nspawn -bD #{cmb}"
+      cr = "./containers/#{name}"
+      die "No container at path #{cmb}, did u create it?" unless Dir.exists? cr
+      
+      mount_container name
+      system "systemd-nspawn -bD #{cr}/combined"
     end
 
     private
+
+    def mount_container(name)
+      cr = "./containers/#{name}"
+
+      #mount base
+      basefs     = File.read "#{cr}/FS"
+      mount_path = "./fs/mnt/#{basefs}"
+      
+      command "mkdir -p #{mount_path}"   
+      command "mount -t squashfs fs/store/#{basefs}.sqsh #{mount_path}"
+
+      # mount container
+      rw          = "#{cr}/rw"
+      combined    = "#{cr}/combined"
+      command "mount -t overlayfs overlayfs -olowerdir=#{mount_path},upperdir=#{rw} #{combined}"      
+    end
 
     def ensure_root!
       die 'Must run as root' unless Process.uid == 0
@@ -80,7 +90,6 @@ module Rucon
 
     def command(cmd)
       env = {'PATH' => ENV['PATH'], 'HOME' => ENV['HOME']}
-      
       rd, wr = IO.pipe
       pid = fork do
         rd.close
