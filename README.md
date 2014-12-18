@@ -8,6 +8,8 @@ Simple ruby containers
 - systemd-nspawn
 - squasfs
 
+## Install
+
 ## What?
 
 This is the attempt to make containers easy and understandable. The world is now
@@ -19,3 +21,4 @@ Objectives:
 - Run cotnainers
 - Tweak the f out of what you want.
 - Make you understand the concepts.
+

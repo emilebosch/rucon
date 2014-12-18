@@ -5,7 +5,7 @@ Gem::Specification.new do |s|
   s.version     = Rucon::VERSION
   s.date        = '2014-12-18'
   s.summary     = "Rucon"
-  s.description = "Ruby mini container"
+  s.description = "Ruby mini containers"
   s.authors     = ["Emile Bosch"]
   s.email       = 'emilebosch@me.com'
   s.files        = Dir.glob('{lib}/**/*') + %w(README.md rucon.gemspec Gemfile)
