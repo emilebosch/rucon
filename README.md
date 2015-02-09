@@ -10,6 +10,14 @@ Simple ruby containers. Aimed as a POC and maybe someday a bit more than that.
 
 ## Install
 
+sudo apt-get update
+sudo apt-get install squashfs-tools debootstrap 
+
+base dir
+```
+sudo debootstrap vivid my-base
+```
+
 Not ready for installation yet. Only if you're hacking on this repo. 
 
 ## What?
