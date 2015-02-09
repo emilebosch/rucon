@@ -4,7 +4,7 @@ Simple ruby containers. Aimed as a POC and maybe someday a bit more than that.
 
 - ruby
 - curl
-- systemd-nspawn
+- [systemd-nspawn](http://www.freedesktop.org/software/systemd/man/systemd-nspawn.html)
 - squasfs
 - overlayfs
 
@@ -27,16 +27,8 @@ Objectives:
 # Usage
 
 ```
-bundle
-bundle binstub rucon
-
-sudo ./bin/rucon fetchfs file:///home/vagrant/base.sqsh my-base
-sudo ./bin/rucon create my-container my-base
-sudo ./bin/rucon enter my-container
-
-# passwd root 
-# apt-install ruby etc etc
-# exit
-
-sudo ./bin/rucon boot my-container
+rucon fetchfs file:///home/vagrant/base.sqsh my-base
+rucon create my-container my-base
+rucon enter my-container
+rucon boot my-container
 ```

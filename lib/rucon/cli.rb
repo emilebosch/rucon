@@ -44,7 +44,7 @@ module Rucon
       ensure_root!
 
       cr = "./containers/#{name}"
-      die "No container at path #{cmb}, did u create it?" unless Dir.exists? cr
+      die "No container at path #{cr}, did u create it?" unless Dir.exists? cr
 
       mount_container name
       system "systemd-nspawn -D #{cr}/combined"
@@ -55,7 +55,7 @@ module Rucon
       ensure_root!
       
       cr = "./containers/#{name}"
-      die "No container at path #{cmb}, did u create it?" unless Dir.exists? cr
+      die "No container at path #{cr}, did u create it?" unless Dir.exists? cr
       
       mount_container name
       system "systemd-nspawn -bD #{cr}/combined"
